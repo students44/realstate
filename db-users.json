@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "69c8fb34e2490a8cbc77e1ea",
+    "name": "Muneeb khan",
+    "email": "muneebtech005@gmail.com",
+    "password": "$2b$10$qP4ShOBYovsTwYSlHN.bXOTaHmJ.UxTdkyuXbD/c/kLgIUqY3Lhu.",
+    "phone": "03452645064",
+    "role": "admin",
+    "wishlist": [],
+    "createdAt": "2026-03-29T10:13:08.499Z",
+    "updatedAt": "2026-03-29T10:13:08.499Z",
+    "__v": 0
+  },
+  {
+    "_id": "69c8fb9be2490a8cbc77e1ef",
+    "name": "Muneeb",
+    "email": "muneeb@example.com",
+    "password": "$2b$10$JsZpHm8Wq8Q84S53kMjMM.NgloT57aXydf6flPCUxa7MCkPBftBFa",
+    "phone": "123456789",
+    "role": "user",
+    "wishlist": [],
+    "createdAt": "2026-03-29T10:14:51.617Z",
+    "updatedAt": "2026-03-29T10:14:51.617Z",
+    "__v": 0
+  }
+]

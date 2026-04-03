@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import ImageUpload from "@/components/properties/ImageUpload";
 
 export default function AddPropertyPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -20,7 +22,6 @@ export default function AddPropertyPage() {
     areaUnit: "sqft",
     "location.address": "",
     "location.city": "",
-    images: "",
     features: "",
   });
 
@@ -31,6 +32,12 @@ export default function AddPropertyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (images.length === 0) {
+      toast.error("Please upload at least one image.");
+      setLoading(false);
+      return;
+    }
 
     try {
       // Format data
@@ -48,7 +55,7 @@ export default function AddPropertyPage() {
           address: formData["location.address"],
           city: formData["location.city"],
         },
-        images: formData.images ? formData.images.split(",").map(i => i.trim()) : [],
+        images: images,
         features: formData.features ? formData.features.split(",").map(f => f.trim()) : [],
       };
 
@@ -166,12 +173,12 @@ export default function AddPropertyPage() {
 
         {/* Images */}
         <div className="space-y-4 pt-6 border-t border-foreground/10">
-          <h2 className="text-xl font-bold">Images (Mock integration)</h2>
-          <div>
-             <label className="block text-sm font-medium mb-1">Direct Image URLs (comma separated)</label>
-             <textarea name="images" value={formData.images} onChange={handleChange} rows={3} className="w-full px-4 py-3 rounded-xl border border-foreground/20 bg-background focus:ring-2 focus:ring-blue-500 outline-none resize-none text-sm" placeholder="https://image1.jpg, https://image2.jpg..."></textarea>
-             <p className="text-xs text-foreground/50 mt-2">For this demo, provide absolute HTTPS URLs to images, separated by commas.</p>
+          <div className="flex justify-between items-end">
+            <h2 className="text-xl font-bold uppercase tracking-widest text-foreground/40 text-sm">Media & Photos</h2>
+            <span className="text-xs font-bold text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full uppercase italic">Required *</span>
           </div>
+          <ImageUpload images={images} onChange={setImages} />
+          <p className="text-xs text-foreground/50 mt-2">Upload high-quality photos of the property. Drag to reorder (coming soon).</p>
         </div>
 
         <div className="pt-6 border-t border-foreground/10 flex justify-end gap-4">

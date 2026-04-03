@@ -1,6 +1,7 @@
-import { FiMapPin, FiCheckCircle, FiShare2, FiHeart } from "react-icons/fi";
+import { FiMapPin, FiCheckCircle } from "react-icons/fi";
 import { FaBed, FaBath } from "react-icons/fa";
 import ImageGallery from "@/components/properties/ImageGallery";
+import PropertyActions from "@/components/properties/PropertyActions"; // New client component
 import dbConnect from "@/lib/mongodb";
 import Property from "@/models/Property";
 import User from "@/models/User"; // Import User for population
@@ -64,18 +65,16 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
               {property.location.address}, {property.location.city}, {property.location.state}
             </div>
           </div>
-          <div className="flex flex-col md:items-end gap-4">
-            <div className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+          <div className="flex flex-col md:items-end gap-6">
+            <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
               {formatPrice(property.price)}
             </div>
-            <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 transition-colors font-medium border border-foreground/10">
-                <FiShare2 /> Share
-              </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 transition-colors font-medium border border-red-500/20">
-                <FiHeart /> Save
-              </button>
-            </div>
+            {/* Interactive Buttons */}
+            <PropertyActions 
+              propertyId={property._id} 
+              title={property.title} 
+              slug={property.slug} 
+            />
           </div>
         </div>
 
@@ -158,7 +157,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                  <div>
                    <textarea placeholder="I am interested in this property..." rows={4} className="w-full px-4 py-3 rounded-xl bg-background border border-foreground/20 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all resize-none" required defaultValue={`Hi, I found your property "${property.title}" on Asmerat Real Estate and would like to arrange a viewing.`}></textarea>
                  </div>
-                 <button type="submit" className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20">
+                 <button type="submit" className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-blue-500/20 cursor-pointer active:scale-95">
                    Send Message
                  </button>
                </form>
@@ -169,7 +168,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                    href={whatsappUrl}
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="w-full py-3 bg-[#25D366] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-500/20"
+                   className="w-full py-3 bg-[#25D366] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-500/20 cursor-pointer"
                  >
                     WhatsApp Message
                  </a>

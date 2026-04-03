@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import ImageUpload from "@/components/properties/ImageUpload";
 
 export default function AdminEditForm({ initialData }: { initialData: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState<string[]>(initialData.images || []);
 
   const [formData, setFormData] = useState({
     title: initialData.title || "",
@@ -20,7 +22,6 @@ export default function AdminEditForm({ initialData }: { initialData: any }) {
     areaUnit: initialData.areaUnit || "sqft",
     "location.address": initialData.location?.address || "",
     "location.city": initialData.location?.city || "",
-    images: initialData.images ? initialData.images.join(", ") : "",
     features: initialData.features ? initialData.features.join(", ") : "",
   });
 
@@ -31,6 +32,12 @@ export default function AdminEditForm({ initialData }: { initialData: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (images.length === 0) {
+      toast.error("Please upload at least one image.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const dataPayload = {
@@ -47,7 +54,7 @@ export default function AdminEditForm({ initialData }: { initialData: any }) {
           address: formData["location.address"],
           city: formData["location.city"],
         },
-        images: formData.images ? formData.images.split(",").map((i: string) => i.trim()).filter(Boolean) : [],
+        images: images,
         features: formData.features ? formData.features.split(",").map((f: string) => f.trim()).filter(Boolean) : [],
       };
 
@@ -158,11 +165,12 @@ export default function AdminEditForm({ initialData }: { initialData: any }) {
 
         {/* Images */}
         <div className="space-y-4 pt-6 border-t border-foreground/10">
-          <h2 className="text-xl font-bold">Images (Mock integration)</h2>
-          <div>
-             <label className="block text-sm font-medium mb-1">Direct Image URLs (comma separated)</label>
-             <textarea name="images" value={formData.images} onChange={handleChange} rows={3} className="w-full px-4 py-3 rounded-xl border border-foreground/20 bg-background focus:ring-2 focus:ring-blue-500 outline-none resize-none text-sm"></textarea>
+          <div className="flex justify-between items-end">
+            <h2 className="text-xl font-bold uppercase tracking-widest text-foreground/40 text-sm">Media & Photos</h2>
+            <span className="text-xs font-bold text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full uppercase italic">Required *</span>
           </div>
+          <ImageUpload images={images} onChange={setImages} />
+          <p className="text-xs text-foreground/50 mt-2">Manage property photos. Drag to reorder (coming soon).</p>
         </div>
 
         <div className="pt-6 border-t border-foreground/10 flex justify-end gap-4">

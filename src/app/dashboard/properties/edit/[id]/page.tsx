@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import AdminEditForm from "./AdminEditForm";
 import { Types } from "mongoose";
 
-export default async function EditPropertyPage({ params }: { params: { id: string } }) {
+export default async function EditPropertyPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await auth();
 
   if (!session || !session.user) {
@@ -13,13 +14,13 @@ export default async function EditPropertyPage({ params }: { params: { id: strin
   }
 
   // Validate ObjectID to prevent crash
-  if (!Types.ObjectId.isValid(params.id)) {
+  if (!Types.ObjectId.isValid(id)) {
       return <div className="p-8 text-center text-red-500">Invalid Property ID</div>
   }
 
   await dbConnect();
   
-  const property = await Property.findById(params.id).lean();
+  const property = await Property.findById(id).lean();
 
   if (!property) {
     return <div className="p-8 text-center font-bold">Property not found!</div>;

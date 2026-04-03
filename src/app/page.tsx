@@ -1,12 +1,15 @@
 import HeroSection from "@/components/home/HeroSection";
 import StatsSection from "@/components/home/StatsSection";
+import LatestProperties from "@/components/home/LatestProperties";
 
 export default function Home() {
   return (
-    <div>
+    <div className="space-y-12 pb-20">
       <HeroSection />
       <StatsSection />
-      {/* Featured Properties Section will go here */}
+      <LatestProperties />
+      {/* Other sections like Testimonials, Features can go here */}
     </div>
   );
 }
+

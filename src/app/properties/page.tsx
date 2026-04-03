@@ -3,18 +3,44 @@ import PropertyFilters from "@/components/properties/PropertyFilters";
 import dbConnect from "@/lib/mongodb";
 import Property from "@/models/Property";
 
-export default async function PropertiesPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+export default async function PropertiesPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   await dbConnect();
   
-  // Extract simple filters
-  const type = typeof searchParams.type === 'string' ? searchParams.type : undefined;
-  const purpose = typeof searchParams.purpose === 'string' ? searchParams.purpose : undefined;
+  // Await searchParams in Next.js 15
+  const resolvedParams = await searchParams;
+  const type = typeof resolvedParams.type === 'string' ? resolvedParams.type : undefined;
+  const purpose = typeof resolvedParams.purpose === 'string' ? resolvedParams.purpose : undefined;
+  const location = typeof resolvedParams.location === 'string' ? resolvedParams.location : undefined;
+  const minPrice = parseInt(typeof resolvedParams.minPrice === 'string' ? resolvedParams.minPrice : "0");
+  const maxPrice = parseInt(typeof resolvedParams.maxPrice === 'string' ? resolvedParams.maxPrice : "0");
+  const bedrooms = parseInt(typeof resolvedParams.bedrooms === 'string' ? resolvedParams.bedrooms : "0");
+  const bathrooms = parseInt(typeof resolvedParams.bathrooms === 'string' ? resolvedParams.bathrooms : "0");
 
   let query: any = { status: "approved" };
   if (type && type !== "all") query.propertyType = type;
   if (purpose && purpose !== "all") query.purpose = purpose;
+  
+  // Price range filter
+  if (minPrice > 0 || maxPrice > 0) {
+    query.price = {};
+    if (minPrice > 0) query.price.$gte = minPrice;
+    if (maxPrice > 0) query.price.$lte = maxPrice;
+  }
+
+  // Bed/Bath filter
+  if (bedrooms > 0) query.bedrooms = bedrooms;
+  if (bathrooms > 0) query.bathrooms = bathrooms;
+  
+  // Add location search (case-insensitive regex on city or address)
+  if (location) {
+    query.$or = [
+      { "location.city": { $regex: location, $options: "i" } },
+      { "location.address": { $regex: location, $options: "i" } }
+    ];
+  }
 
   const rawProperties = await Property.find(query).sort({ createdAt: -1 }).lean();
+
   
   // Convert _id ObjectIDs to string for client passing
   const properties = rawProperties.map(p => ({

@@ -5,10 +5,14 @@ import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FiSearch, FiMapPin, FiHome } from "react-icons/fi";
 
 export default function HeroSection() {
   const [init, setInit] = useState(false);
+  const [location, setLocation] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -17,6 +21,14 @@ export default function HeroSection() {
       setInit(true);
     });
   }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (location) params.append("location", location);
+    if (propertyType) params.append("type", propertyType);
+    
+    router.push(`/properties?${params.toString()}`);
+  };
 
   return (
     <section className="relative h-[90vh] w-full flex items-center justify-center overflow-hidden bg-background">
@@ -76,18 +88,32 @@ export default function HeroSection() {
         >
           <div className="flex-1 relative">
             <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50" />
-            <input type="text" placeholder="Location" className="w-full pl-10 pr-4 py-3 rounded-lg bg-foreground/5 border border-transparent focus:border-blue-500 focus:outline-none transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Location" 
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-lg bg-foreground/5 border border-transparent focus:border-blue-500 focus:outline-none transition-colors" 
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
           </div>
           <div className="flex-1 relative">
             <FiHome className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50" />
-            <select className="w-full pl-10 pr-4 py-3 rounded-lg bg-foreground/5 border border-transparent focus:border-blue-500 focus:outline-none transition-colors appearance-none">
+            <select 
+              value={propertyType}
+              onChange={(e) => setPropertyType(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-lg bg-foreground/5 border border-transparent focus:border-blue-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+            >
               <option value="">Property Type</option>
               <option value="house">House</option>
               <option value="apartment">Apartment</option>
               <option value="plot">Plot</option>
             </select>
           </div>
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+          <button 
+            onClick={handleSearch}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          >
             <FiSearch /> Search
           </button>
         </motion.div>
@@ -109,3 +135,4 @@ export default function HeroSection() {
     </section>
   );
 }
+

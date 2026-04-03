@@ -8,10 +8,9 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
     const purpose = searchParams.get("purpose");
-    const status = searchParams.get("status") || "approved"; 
-    // Filter out unapproved mappings for public end unless explicitly requested by admin
+    const limit = parseInt(searchParams.get("limit") || "0");
+    const status = searchParams.get("status") || "approved";
     
-    // Check if admin is requesting all statuses
     const session = await auth();
     let query: any = { status };
     if (session?.user?.role === "admin" && searchParams.has("status")) {
@@ -23,7 +22,7 @@ export async function GET(req: Request) {
 
     await dbConnect();
 
-    const properties = await Property.find(query).sort({ createdAt: -1 });
+    const properties = await Property.find(query).sort({ createdAt: -1 }).limit(limit);
 
     return NextResponse.json({ properties }, { status: 200 });
   } catch (error) {

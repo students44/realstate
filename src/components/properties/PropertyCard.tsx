@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { FiMapPin, FiMaximize, FiHeart } from "react-icons/fi";
 import { FaBed, FaBath } from "react-icons/fa";

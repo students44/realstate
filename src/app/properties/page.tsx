@@ -79,8 +79,8 @@ export default async function PropertiesPage({ searchParams }: { searchParams: P
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {properties.length > 0 ? properties.map((property: any) => (
-                <PropertyCard key={property._id} property={property} />
+              {properties.length > 0 ? properties.map((property: any, index: number) => (
+                <PropertyCard key={property._id} property={property} index={index} />
               )) : (
                 <div className="col-span-full py-20 text-center text-foreground/50 text-lg">
                    No properties found matching your criteria.

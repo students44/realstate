@@ -3,12 +3,15 @@ import { FaBed, FaBath } from "react-icons/fa";
 import ImageGallery from "@/components/properties/ImageGallery";
 import dbConnect from "@/lib/mongodb";
 import Property from "@/models/Property";
+import User from "@/models/User"; // Import User for population
 import { notFound } from "next/navigation";
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   await dbConnect();
-  const rawProperty = await Property.findOne({ slug }).lean();
+  
+  // Populate owner to get their phone number
+  const rawProperty = await Property.findOne({ slug }).populate("owner", "name phone").lean();
 
   if (!rawProperty) {
     notFound();
@@ -18,7 +21,10 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
   const property: any = {
      ...rawProperty,
      _id: String(rawProperty._id),
-     owner: String(rawProperty.owner)
+     owner: {
+       ...rawProperty.owner,
+       _id: String((rawProperty.owner as any)._id)
+     }
   };
 
   const formatPrice = (price: number) => {
@@ -28,6 +34,12 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
       maximumFractionDigits: 0,
     }).format(price);
   };
+
+  // WhatsApp logic
+  const domain = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const message = `Hi, I'm interested in your property "${property.title}" on Asmerat Real Estate. Can you provide more details?\n\nView property: ${domain}/properties/${property.slug}`;
+  const phone = (property.owner?.phone || "923000000000").replace(/\D/g, ""); // Clean phone number
+  const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -153,9 +165,14 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                
                <div className="mt-8 pt-8 border-t border-foreground/10 text-center">
                  <p className="text-foreground/50 mb-4 font-medium uppercase tracking-wider text-sm">Or contact directly via</p>
-                 <button className="w-full py-3 bg-[#25D366] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#20bd5a] transition-colors">
+                 <a 
+                   href={whatsappUrl}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="w-full py-3 bg-[#25D366] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-500/20"
+                 >
                     WhatsApp Message
-                 </button>
+                 </a>
                </div>
              </div>
           </div>

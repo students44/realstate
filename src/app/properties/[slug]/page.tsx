@@ -5,9 +5,10 @@ import dbConnect from "@/lib/mongodb";
 import Property from "@/models/Property";
 import { notFound } from "next/navigation";
 
-export default async function PropertyDetailPage({ params }: { params: { slug: string } }) {
+export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   await dbConnect();
-  const rawProperty = await Property.findOne({ slug: params.slug }).lean();
+  const rawProperty = await Property.findOne({ slug }).lean();
 
   if (!rawProperty) {
     notFound();

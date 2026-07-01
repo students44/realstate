@@ -1,6 +1,7 @@
+import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
-import { FiSearch, FiMail, FiCalendar, FiShield } from "react-icons/fi";
+import { FiSearch, FiMail, FiCalendar, FiShield, FiTrash2 } from "react-icons/fi";
 
 export default async function AdminUsersPage({
   searchParams
@@ -22,6 +23,14 @@ export default async function AdminUsersPage({
   }
 
   const users = await User.find(query).sort({ createdAt: -1 }).lean();
+
+  async function deleteUser(formData: FormData) {
+    "use server";
+    const id = formData.get("id");
+    await dbConnect();
+    await User.findByIdAndDelete(id);
+    revalidatePath("/admin/users");
+  }
 
   return (
     <div className="space-y-8">
@@ -78,20 +87,28 @@ export default async function AdminUsersPage({
                     </div>
                   </td>
                   <td className="p-6">
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border flex items-center gap-2 w-fit ${
-                      user.role === "admin" ? "bg-purple-500/10 text-purple-600 border-purple-500/20" : "bg-blue-500/10 text-blue-600 border-blue-500/20"
-                    }`}>
-                      <FiShield size={12} />
-                      {user.role}
-                    </span>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border flex items-center gap-2 w-fit ${
+                        user.role === "admin" ? "bg-purple-500/10 text-purple-600 border-purple-500/20" : "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                      }`}>
+                        <FiShield size={12} />
+                        {user.role}
+                      </span>
+                      <form action={deleteUser} className="inline">
+                        <input type="hidden" name="id" value={user._id.toString()} />
+                        <button type="submit" className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all" title="Delete User">
+                          <FiTrash2 size={16} />
+                        </button>
+                      </form>
+                    </div>
                   </td>
                   <td className="p-6">
                     <div className="flex items-center gap-2 text-foreground/40 text-sm">
                       <FiCalendar size={14} />
-                      {new Date(user.createdAt).toLocaleDateString("en-US", { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric' 
+                      {new Date(user.createdAt).toLocaleDateString("en-US", {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
                       })}
                     </div>
                   </td>

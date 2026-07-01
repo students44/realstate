@@ -112,7 +112,7 @@ export default async function AdminPropertiesPage({
                     </span>
                   </td>
                   <td className="p-6 text-right">
-                    <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center justify-end gap-3 transition-all">
                        {property.status === "pending" && (
                          <>
                            <form action={approveProperty}>

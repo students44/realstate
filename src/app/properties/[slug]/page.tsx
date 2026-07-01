@@ -130,7 +130,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             <section>
               <h2 className="text-2xl font-bold mb-6">Premium Features</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6">
-                {property.features.map((feature, idx) => (
+                {property.features.map((feature: string, idx: number) => (
                   <div key={idx} className="flex items-center gap-3 text-foreground/80">
                     <FiCheckCircle className="text-green-500 flex-shrink-0" size={20} />
                     <span>{feature}</span>

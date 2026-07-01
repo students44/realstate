@@ -3,10 +3,11 @@ import dbConnect from "@/lib/mongodb";
 import Property from "@/models/Property";
 import { auth } from "@/auth";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   try {
     await dbConnect();
-    const property = await Property.findById(params.id);
+    const property = await Property.findById(resolvedParams.id);
     if (!property) return NextResponse.json({ error: "Property not found" }, { status: 404 });
 
     return NextResponse.json({ property }, { status: 200 });
@@ -15,13 +16,14 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   try {
     const session = await auth();
     if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await dbConnect();
-    const property = await Property.findById(params.id);
+    const property = await Property.findById(resolvedParams.id);
     
     if (!property) return NextResponse.json({ error: "Property not found" }, { status: 404 });
 
@@ -31,7 +33,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
     const updateData = await req.json();
     
-    const updatedProperty = await Property.findByIdAndUpdate(params.id, updateData, { new: true });
+    const updatedProperty = await Property.findByIdAndUpdate(resolvedParams.id, updateData, { new: true });
 
     return NextResponse.json({ message: "Property updated successfully", property: updatedProperty }, { status: 200 });
   } catch (error) {
@@ -39,13 +41,14 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   try {
     const session = await auth();
     if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await dbConnect();
-    const property = await Property.findById(params.id);
+    const property = await Property.findById(resolvedParams.id);
     
     if (!property) return NextResponse.json({ error: "Property not found" }, { status: 404 });
 
@@ -53,7 +56,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    await Property.findByIdAndDelete(params.id);
+    await Property.findByIdAndDelete(resolvedParams.id);
 
     return NextResponse.json({ message: "Property deleted successfully" }, { status: 200 });
   } catch (error) {

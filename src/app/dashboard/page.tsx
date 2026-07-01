@@ -20,10 +20,21 @@ export default async function DashboardPage() {
   const savedProperties = user?.wishlist?.length || 0;
 
   // Recent Listings (My Properties)
-  const recentListings = await Property.find({ owner: session.user.id })
+  const recentListingsRaw = await Property.find({ owner: session.user.id })
     .sort({ createdAt: -1 })
     .limit(3)
-    .lean() as any;
+    .lean() as any[];
+
+  const recentListings = recentListingsRaw.map((prop) => {
+    const cleaned = {
+      ...prop,
+      _id: String(prop._id),
+      owner: prop.owner ? String(prop.owner) : undefined,
+      createdAt: prop.createdAt ? new Date(prop.createdAt).toISOString() : undefined,
+      updatedAt: prop.updatedAt ? new Date(prop.updatedAt).toISOString() : undefined,
+    };
+    return JSON.parse(JSON.stringify(cleaned));
+  });
 
   const stats = [
     { label: "Active Listings", value: activeListings, icon: FiCheckSquare, color: "text-green-500" },
@@ -72,7 +83,7 @@ export default async function DashboardPage() {
            
            <div className="space-y-4">
               {recentListings.map((prop: any) => (
-                <DashboardPropertyCard key={prop._id.toString()} property={prop} />
+                <DashboardPropertyCard key={prop._id.toString()} property={JSON.parse(JSON.stringify(prop))} />
               ))}
               
               {recentListings.length === 0 && (

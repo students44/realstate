@@ -17,7 +17,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
-              Asmerat Real Estate
+             <img src="../public/assets/logo.png" alt="Logo"/>
             </Link>
           </div>
           
